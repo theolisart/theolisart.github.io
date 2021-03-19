@@ -2,9 +2,9 @@
 layout: default
 ---
 
-<div class="blog">
-
+<div class="cv">
   {{ content }}
+
 
   {% if site.paginate %}
     {% assign posts = paginator.posts %}
@@ -12,6 +12,7 @@ layout: default
     {% assign posts = site.posts %}
   {% endif %}
 
+  <!--
   {%- if posts.size > 0 -%}
     {%- if page.list_title -%}
       <h2 class="post-list-heading">{{ page.list_title }}</h2>
@@ -32,6 +33,7 @@ layout: default
       </li>
       {%- endfor -%}
     </ul>
+  -->
 
 
     {% if site.paginate %}
