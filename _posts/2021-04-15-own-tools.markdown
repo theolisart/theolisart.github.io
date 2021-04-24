@@ -1,0 +1,31 @@
+---
+layout: post
+title:  "Build your own tools, they say, ok"
+date:   2021-04-15 22:59:24 +0100
+categories: jekyll update
+---
+
+From the good professor Moriarty on the Sixtysymbols youtube channel to John Carmack himself it seems so that there exists a consensus regarding software : build your own goddamn tools. When thinking about it, it is quite a scary task especially if you can in fact spend all this time actually working on your own project or field of research. To be fair, I really like *romantically* the idea of having build almost everything that allowed my work to advance. Often this method isn't the right one especially if you have no need for developing new technologies, or that you have a proper idea of where you are going. On most forums about gamedev for example it is quite clear that the people willing to build a physics engine or game engine will live through the pain to learn the tech. It is the same in the realm of numerical instruments, moste people will use frameworks such as JUCE. Why would you want to rethink the wheel design, go out in the woods to get the planks, spend a lot of energy actually making it right when in the end, you just wanted to move goods to one point to the other. You'd just use available carts that is pretty obvious.
+
+Let's not do that, first of all because learning new programming is fun, moreover well done quantum simulation software isn't too present outside of big companies or research. It is starting to get some steam with the quite well done simulators build by IBM for their Qskit suite. I want to understand better quantum dynamical semigroups at the moment, in the context of markovian dynamics. In the end, even though continuous Hamiltonian evolution for quantum computing isn't too hot at the moment, looking at what D-wave is doing no-one will complain about additional software, as long as it isn't too convoluted to use.
+
+So I like software and physics, the goal is hence to make an IDE for continuous quantum simulations. The project will articulate between two pillars : first will be the C library with resolutions methods, especially stochastic methods for Lindblad equations with the possibility for parallelism. Extending this to MSI protocols for multiple processors should then not be too convoluted. This is of course essential for scaling the experiments as it is the force and downfall of Monte-Carlo style solvers. The second motivation for making a new library package is simply that writing by itself the quantum trajectory interpretation of those first-order differential equations for the density operator is interesting by itself to understand the underlying physics. Also as it will be the most complicated part of the program it will be the most useful to recycle code, hence a C library for this generalized type of equations.
+
+Second will be the GUI, with a pseudo-python interpretor which is not mandatory to use the tools (I want the tools to work with python a little the way Qskit works), then in the same window a maximum of information concerning the running experiment, the state, the convergence. Finally a complete OpenGL Bloch sphere representation of what is happening relatively to qubit dynamics. This is more an effort on my part to be able to automatize experiments also and explore behaviors for varying interaction models etc...
+
+I like giving identity to my projects, even though I did close to nothing to get there. I don't know, I like having some kind of vision and sense of completeness to the project. It might be vain, it's just the way I work and the reason I am not *just* making the C library.
+
+## Laying the groundwork
+From the get-go we need efficient interfacing between C and Python. I want the GUI and experiment controls to be done in Python, the drawing will probably be an OpenGL app and of course the numerical analysis will be in C. Let's write a basic Python program, that interfaces efficiently with C.
+
+
+## Basic GUI, testing tools
+
+
+## Let's get serious
+
+
+## Graphical representation
+
+
+##
