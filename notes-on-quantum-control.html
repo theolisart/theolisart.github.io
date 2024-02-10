@@ -37,16 +37,146 @@
 <p>In <a href="https://theolisart.github.io/category/notes.html">Notes</a>.</p>
 <p>tags: <a href="https://theolisart.github.io/tag/quanutum.html">quanutum</a> <a href="https://theolisart.github.io/tag/computing.html">computing</a> <a href="https://theolisart.github.io/tag/dynamics.html">dynamics</a> </p>
 </footer><!-- /.post-info -->      <h1>Introduction</h1>
-<p>The purpose of this serie is for me to gather easily to access notes on some of my research, which is mainly quantum computing and quantum engineering. I am also particularely interested in more exotic computational models. Those notes will evolve over time and is in preparatory phase. </p>
+<p>Why is quantum control theory and quantum dynamics can help us, in developping interesting and powerful quantum software tools, as user-side quantum engineers ?</p>
+<p>What is a parametric quantum circuit ? Within the quantum circuit framework, it is rigorously some quantum interactions build on entanglement layers (CNOT) and some parametric (XYZ) set of qubit rotations. Quantum control ask the (really reasonnable question) of wether or not it is <strong>physically and technologically</strong> possible to apply those rotations using pulses control. </p>
+<p>For any of our quantum devices, especially dominating ones, pulses (and associated pulse shapes) are the control parameters of micro or meso quantum systems. In the case of superconducting transmon, variable configurations of correlators, Josephson junctions and layout for electrical quantum control is layed out in a quantum circuit, design and topologies are engineered around the idea of quantum control using microwave pulses, whose shapes, sequences and timing have also to be described through (optimal) quantum control. It is moreover the case also for any dominating quantum technologies, Rydberg atoms are being moved around within laser tweezers and raised or lowered from one quantum state to the other also using engineered control pulses, this time LASER based. Finally, it is the same for ion traps, with EM and MW pulses. </p>
+<p>This list is of course non-exhaustive, however it goes almost without saying that quantum control is an essential part of the control electronics of a given quantum system. Now one can raise the question, why would I need quantum control theory as an user-side quantum engineer ? I trust the hardware side to have well defined qubits and well defined program to pulses compiler and low latencies? This would be a completely valid question. </p>
+<p>It turns out however that in the NISQ era, effort and research is going more and more towards parametric quantum algorithns. Those are hybrid quantum routines with as its core philosophy the offloading of some complicated task to some trainable quantum sytem. For exampl for quantum chemistry tasks, it is beleived that a well designed, physics-inspired quantum antzats could be more efficient than DFT based classical methods at simulating complex quantum molecules. In addition we have other quantum algorithms, such as HHL, QAOA, VQE, and some emergent QML methods which are entirely based on this hybrid quantum classical model, for example the latest demonstration that quantum denoiser models can be achieved. </p>
+<p>Parametric quantum circuits are believed to be the emerging candidates for somewhat early quantum advantage, however the only physics-motivated way of expressing their behavior is through Lie Algebras and their quantum dynamical structure. This structure is analyzed through rank analysis, and by extention expressivity analysis, a conceptual category of quantum control theory. </p>
 <h1>Table of contents</h1>
 <ol>
-<li><a href="#introduction">Introduction</a></li>
+<li><a href="#introduction">Intuitive approach: writeup of the David J. Tannor, commented</a></li>
 <li><a href="#paragraph1">Some paragraph</a><ol>
 <li><a href="#subparagraph1">Sub paragraph</a></li>
 </ol>
 </li>
 <li><a href="#paragraph2">Another paragraph</a></li>
 </ol>
+<h1>Introduction and context</h1>
+<p>The Tannor book, introduction to Quantum Machanics, a time-dependent perspective is mainly organized around a relatively new field of chemical reaction control using light pulses. Chapter 16, <strong>Design of Femtosecond pulse Sequences to Control Chemical Reactions</strong> is a classic in the genre and quite a niche but interesting activity. However it is interesting for us as it introduces a lot of <strong>quantum control</strong> ideas that translate immediately to our interest in quantum information science. </p>
+<h2>Controllability Theory</h2>
+<p>In the field of system engineering two concepts are central to signal and system control: controllability and observability. Those concepts are relatively easy to think about, for any dynamical "black box" system, defined by it's time evolution $S(L_i, t) \forall i \in [0, n]$, any state of the system in its parameter space (or all configurations of the dynamical system) can be reached from one state to the other, as well as for any time $t\in [0, T]$, the set of parameters can be measured and observed. This is absolutely foundamental for control, as it allows to create objective and feedback control procedures to automatically bring a system to a desirable value. </p>
+<p>In the case of quantum systems it is quite different, for once quantum internal states are not necesserally accessible. A sequence of measurement can discover the state at a certain time but famously in quantum mechanics, measurement interacts with the state, hence constant observation of the system is not possible. It is quite clear that quantum control will have its own perks and particularities. </p>
+<p>Quantum control answers the question: </p>
+<blockquote>
+<p>For any state $\psi_i$ at $t=0$, is it possible to reach <strong>any</strong> final state $\psi_f$ at $t=T$?</p>
+</blockquote>
+<p>(We will see later when going into quantum informational context, this definition might be insufficient)</p>
+<p>It turns out that the classical, general theory of controllability can be applied to finate-dimensional dynamical quantum systems without any radical changes. It makes sense as even though quantum mechanics can seem like abstract and alien theory of Nature, the structure of it and predictions is governed by a well understood and defined differential equation (the Schrodinger's equation), and then the dynamical time evolution of the quantum states (defined by either density operators or quantum state vectors) follow some kind of trajectory. The only difference is the direct accessibility of this trajectory, which will create some interesting perks within quantum control. At this time however, infinite-dimensional quantum control is however not completely understood. </p>
+<h3>The mathematical theory of linear quantum control</h3>
+<p>Let us suppose a simple multi-dimensional dynamical system described by the following equation: </p>
+<p>$$
+\dot{x}(t) = Ax(t)
+$$</p>
+<p>It is a simple first order equation with $A$ some $n \times n$ matrix representing the inner dynamics of the system. We know from system theory and calculus 1 that a forcing parameter can be added to transform this free Cauchy problem first order ODE into a dynamically controlled equation: </p>
+<p>$$
+\dot{x}(t) = Ax(t) + Bu(t)
+$$</p>
+<p>$u$ is the control (forcing) parameter of $M$ componants where $x$ is the state vector of $N$ componant. We note that for this simple clase: </p>
+<blockquote>
+<p>The equation is said to be controllable if for every $x_0$ and $x_1$ and every $T &gt; 0$ there exist such a $u(t)$ such as if $x(0) = x_0$ then $x(T)=x_1$.</p>
+</blockquote>
+<p>A necessery and sufficient condition for controllability, is </p>
+<p>$$
+Rank(B, AB, ..., A^{N-1}B) = N
+$$</p>
+<p>Let's go into more details of this condition: the Rank is the amount of linearly independant columns. I.e. the amount of linearly independant columns of the control and vector matrices (and their products) from the left of the vector matrix, should all from 0 to $N$ be equal to N. Meaning that if at some point, one of those Rank isn't $N$ (most probably lower), the system is not controllable, as it exist configurations from one initial state to the final state, not <strong>every state can be reached</strong>. In terms of pure algebraic concepts, it is clear that if the rank of some configuration cannot be met, it means that the target vector is of lower dimension that the full representation, and then the target space is not being fully spanned and is thus a subspace of all $x_f$.</p>
+<p>Let's show this result as the link to Rank is foundamental for quantum control once we translate into the Lie Algebra language. </p>
+<p>The formal solution of the first order differential equation write: </p>
+<p>$$
+x(t) = \int_{t_0}^{t}e^{A(t - t')}Bu(t')dt' + e^{A(t - t_0)}x(t_0)
+$$</p>
+<p>If you do not remember how to reach this, it is the usual method to solve ODEs, solving for the reduced form, then finding one solution of the full and summing both, then using the full initial conditions of the Cauchy problem. For simplicity and because we just want some theoretical understanding, let's assume that $x_(t_0) = 0$. We have: </p>
+<p>$$
+x(t) = \int_{t_0}^{t}e^{A(t - t')}Bu(t')dt'
+$$</p>
+<p>Let us introduce another real analysis tool that is foundamental to this derivation: the Cayley-Hamilton theorem. It states: </p>
+<blockquote>
+<p>Every square matrix over a commutative ring satisfies its own characteristic equation</p>
+</blockquote>
+<p>We note that a ring is a set equipped with two binary operations, the addition and multiplication with the usual properties of fields (with an obsorbant and neutral for both addition and multiplication, internality properties, etc). However a ring doesn't have to be commutative for multiplication nor needs to have a multiplicative inverse. There's plenty of proofs of this, but let's see how we should use it. </p>
+<p>Those results are particularely important to understand because the mathematical structure in the quantum context. The matrix exponantial is a matrix function on square matrices analogeous to the ordinary exponantial function. In the theory of Lie groups, <strong>the matrix exponantial gives the exponantial map between a matrix Lie Algebra and the corresponding Lie group</strong>. We will come back to this. </p>
+<p>Let $X$ be an $n\times n$ real or complex matrix, the exponantial map is given by:</p>
+<p>$$
+e^{X} = \sum_{k=0}^{\infty}\frac{1}{k!}X^k
+$$</p>
+<p>By interpreting the Cayley-Hamilton as is, combined with a Taylor expention we can find some useful result to determine the minimum representation of the characteristic polynomial. Let's show this. </p>
+<p>We assume a scalar function $f(s)$ that is analytic in a region of the complex plane (hint: that every Cauchy series converges in a singular point in the viscinity of $s$). In that region of $s$, it is safe to assume that the function can be expressed as a power serie of the form: </p>
+<p>$$
+f(s) = \sum_{k=0}^{\infty}\beta_ks^k
+$$</p>
+<h2>Introduction to the proof</h2>
+<p>By definition of matrix determinant, if we have a $n\times n$ matrix $A$ with characteristic polynomial $\Delta(s)$ and eigenvalues $\lambda_i$. As a reminder, the characteristic polynomial is given: </p>
+<p>$$
+\Delta(s) = det|sI - A| = s^n +c_{n-1}s^{n-1} + ... + c_0
+$$</p>
+<p>In this equation it is quite clear that if we set $s = A$, we get the characteristic equation: </p>
+<p>$$
+\Delta(A) = A^n + c_{n-1}A^{n-1} + ... + c_0 I
+$$
+The Cayley-Hamilton theorem states that every matrix satisfies it's own characteristic equation, seeing the definition of the characteristic equation it -of course- makes sense as this equation then should always bring to the zero matrix. </p>
+<p>$$
+\Delta(A) \equiv [0]
+$$</p>
+<p>Polynomial manipulation allows us to re-write the equation representing the characteristic polynomial, let us assume still $A$ and a polynomial in $s$, let's say $P(s)$, we can write right away $P(s)$ as: </p>
+<p>$$
+P(s) = Q(s)\Delta(s) + R(s)
+$$</p>
+<p>Where $Q(s)$ is found by long division and $R(s)$ is simply the reminder of the long division like we did in high school. We note two things about this reminder, first it is clear that as $A$ is of dimension $n\times n$, $R(s)$ can only be of rank $(n-1)$ or less (or $Q(s)$ would be a number, i.e. a trivial polynomial). Moreover by definition of eigenvalues, if $s=\lambda_i, i=1,...,n$, </p>
+<p>$$
+P(\lambda_i) = R(\lambda_i)
+$$</p>
+<p>The same way, for the matrix itself satisfying it's own characteristic equation (CH theorem)</p>
+<p>$$
+P(A) = R(A)
+$$</p>
+<h3>Limited series of the matrix exponantial</h3>
+<p>We saw that locally any analytical fonction will have its Cauchy series converge on one unique point, if this particular analytical function can be represented in the same quotient incorporating the characteristic equation of any matrix, we have: </p>
+<p>$$
+f(s) = \Delta(s)Q(s) + R(s)
+$$</p>
+<p>And in particular if we pick the surroundings of $s=\lambda_i$. We remind ourselves that when we write the extention $f(s) = \sum_{k=0}^{\infty}\beta_k s^k$, we are building the function as a set of orthogonal polynomials spanning the functional space in which $f$ is defined. If we restrict the space of $s$ we know that the exponantial expantion will look exactly the same but limited at rank $(n-1)$ as we showed in the quotient form, when the characteristic equation is being satisfied. We get:</p>
+<p>$$
+\begin{align}
+f(\lambda_i) &amp;= R(\lambda_i)\
+&amp;= \sum_{k=0}^{n-1}\alpha_k\lambda_i^k
+\end{align}
+$$</p>
+<p>Because the set of eigenvalues is known, the previous equation defines a set of simultaneous linear equations that will generate the $(\alpha_0,...\alpha_{n-1})$ coefficients. By construction and because the matrix satisfies it's own characteristic equation, the exact same argument can be build for $f(A)$. We have: </p>
+<p>$$
+\begin{align}
+f(A) &amp;= \sum_{k=0}^{\infty}\beta_ks^k\
+&amp;= \Delta(A)\sum_{k=0}^{\infty}\beta_k s^k + R(A)\
+&amp;= R(A)
+\end{align}
+$$</p>
+<p>Since $\Delta(A) \equiv [0]$, </p>
+<p>$$
+f(A) = \sum_{k=0}^{n-1}\alpha_kA^k
+$$</p>
+<h2>Proof</h2>
+<p>This result will unlock the previous situation, we had the explicit solution for some ODE with control parameter, with matrix exponantial maps. We can write using the previous result: </p>
+<p>$$
+e^{A(t-t'} = \sum_{i=0}^{N-1}\alpha_iA^i(t-t')^i
+$$</p>
+<p>Where the set ${\alpha_i}$ are some scalar coifficients. By substitution we can place this form in the dynamical solution, we get: </p>
+<p>$$
+x(t) = \int_{t_0}^t\sum_{i=0}^{N-1}\alpha_iA^i(t-t')^iBu(t')dt'
+$$</p>
+<p><strong>The vector in the form $A^iBu, i=0, ..., N-1$ corresponds to directions in the Hilbert space</strong>. This last formulation requires some additional interpretation: let's imagine the time interval $[t_0, t]$ is set, then the integral is being done at each interval on $N$ subdivisions of the sum of those vectors weighted by the values of $u$ at each infinitecimal time step. Let's expand this for more clarity: </p>
+<p>$$
+x(t) = \int_{t_0}^t\big(\alpha_0A^0(t-t')^0Bu(t')dt' + \alpha_1A^1(t-t')^1Bu(t')dt' + ... + \alpha_{N - 1}A^{N-1}(t-t')^{N-1}Bu(t')dt'\big)
+$$</p>
+<p>We can thus interpret the sum as a set of independant controls, whose strength is being dictated by the values of $u$. i.e. $N$ independant controls during during the $(t_0 - t)$ interval. </p>
+<p>In principle, once can create any space spanned by the set ${A^iB}$, thus if $Rank(B, AB, ..., A^{N-1}B) = N$, then the reachable space is the <strong>full Hilbert space</strong>, i.e. we have enough <em>independant</em> controls to reach any state. </p>
+<p>It turns out that the claim of linear control theory is stronger than reachability, that all the states in this span can be reached within an arbitrary amount of time, so arbitrary short intervals. Within this frame of reference, regardless on how short the interval $t - t_0$ is, it can be subdivized into $N$ subintervals giving $N$ independant controls. Infinitely short times would mean infinitely strong controls, in which regime linear equation of motion are for sure not valid anymore. </p>
+<p>Links can be made with strong measurement theory and Hamiltonian driving. If we have some quantum dynamical system described by density operator $\rho$ and total hamiltonian $H(t)$, the driving from of the Lindbladian can be written </p>
+<p>$$
+\partial_t\hat{\varrho}(t) = -i[\hat{H}, \hat{\varrho}(t)] + \langle \sigma^2(P)\rangle D(\hat{\varrho}(t))
+$$</p>
+<p>Where we chose a metric system such as $\hbar = 1$, in the driving Von Neumann model, we chose to drive the system by measuring the momentum operator $P$, whose diffusor $D$ is weighted by the measurement probe's standart deviation $\langle \sigma^2(P)\rangle$. I.e. infinitely fast drive of a quantum system impose infinitely squeezed measurement aparatus or driving parameters. This generalizes really easily in the complex plane. </p>
+<h4>The mathematical theory of bilinear quantum control</h4>
+<p>[<strong>to be continued</strong>]</p>
     </div><!-- /.entry-content -->
 
   </article>
